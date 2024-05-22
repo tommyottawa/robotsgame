@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Combat Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Robot Combat Game</h1>
+        <div id="ring">
+            <div id="robot1" class="robot"></div>
+            <div id="robot2" class="robot"></div>
+        </div>
+        <div id="health-bars">
+            <div id="robot1-health" class="health-bar"></div>
+            <div id="robot2-health" class="health-bar"></div>
+        </div>
+        <div id="controls">
+            <button id="attack1">Robot 1 Attack</button>
+            <button id="attack2">Robot 2 Attack</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+#ring {
+    width: 400px;
+    height: 400px;
+    position: relative;
+    border: 5px solid #ecf0f1;
+    margin-bottom: 20px;
+    background-color: #34495e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.robot {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    background-color: #e74c3c;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ecf0f1;
+    font-weight: bold;
+}
+
+#robot2 {
+    background-color: #3498db;
+    left: 300px;
+    top: 300px;
+}
+
+#controls {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.health-bar {
+    width: 150px;
+    height: 20px;
+    background-color: #e74c3c;
+    margin: 10px;
+    transition: width 0.5s;
+}
+
+#robot1-health {
+    background-color: #e74c3c;
+}
+
+#robot2-health {
+    background-color: #3498db;
+    float: right;
+}document.addEventListener('DOMContentLoaded', () => {
+    const robot1 = document.getElementById('robot1');
+    const robot2 = document.getElementById('robot2');
+    const attack1Button = document.getElementById('attack1');
+    const attack2Button = document.getElementById('attack2');
+    const robot1HealthBar = document.getElementById('robot1-health');
+    const robot2HealthBar = document.getElementById('robot2-health');
+
+    let robot1Health = 100;
+    let robot2Health = 100;
+
+    const attackSound = new Howl({
+        src: ['attack.mp3']
+    });
+
+    const winSound = new Howl({
+        src: ['win.mp3']
+    });
+
+    function attack(robot) {
+        if (robot === 'robot1') {
+            robot2Health -= 10;
+            robot2HealthBar.style.width = robot2Health + '%';
+            attackSound.play();
+            gsap.fromTo('#robot2', { x: 0 }, { x: -20, duration: 0.2, yoyo: true, repeat: 1 });
+            checkWin();
+        } else if (robot === 'robot2') {
+            robot1Health -= 10;
+            robot1HealthBar.style.width = robot1Health + '%';
+            attackSound.play();
+            gsap.fromTo('#robot1', { x: 0 }, { x: 20, duration: 0.2, yoyo: true, repeat: 1 });
+            checkWin();
+        }
+    }
+
+    function checkWin() {
+        if (robot1Health <= 0) {
+            alert('Robot 2 wins!');
+            winSound.play();
+            resetGame();
+        } else if (robot2Health <= 0) {
+            alert('Robot 1 wins!');
+            winSound.play();
+            resetGame();
+        }
+    }
+
+    function resetGame() {
+        robot1Health = 100;
+        robot2Health = 100;
+        robot1HealthBar.style.width = robot1Health + '%';
+        robot2HealthBar.style.width = robot2Health + '%';
+    }
+
+    attack1Button.addEventListener('click', () => {
+        attack('robot1');
+    });
+
+    attack2Button.addEventListener('click', () => {
+        attack('robot2');
+    });
+});
